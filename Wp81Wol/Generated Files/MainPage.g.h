@@ -13,6 +13,7 @@ namespace Windows {
         namespace Xaml {
             namespace Controls {
                 ref class TextBlock;
+                ref class ListView;
                 ref class TextBox;
             }
         }
@@ -32,6 +33,7 @@ namespace Wp81Wol
         bool _contentLoaded;
     
         private: ::Windows::UI::Xaml::Controls::TextBlock^ greetingOutput;
+        private: ::Windows::UI::Xaml::Controls::ListView^ listView1;
         private: ::Windows::UI::Xaml::Controls::TextBox^ nameInput;
     };
 }

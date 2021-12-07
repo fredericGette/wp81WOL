@@ -6,6 +6,8 @@
 #include "pch.h"
 #include "MainPage.xaml.h"
 #include "Wol.h"
+#include <cvt/wstring>
+#include <codecvt>
 
 using namespace Wp81Wol;
 
@@ -43,6 +45,14 @@ void MainPage::OnNavigatedTo(NavigationEventArgs^ e)
 	// Windows::Phone::UI::Input::HardwareButtons.BackPressed event.
 	// If you are using the NavigationHelper provided by some templates,
 	// this event is handled for you.
+
+	// Data source.
+	Platform::Collections::Vector<String^>^ itemsList =
+		ref new Platform::Collections::Vector<String^>();
+	itemsList->Append("Item A");
+	itemsList->Append("Item B");
+
+	listView1->ItemsSource = itemsList;
 }
 
 void Wp81Wol::Debug(const char* format, ...)
@@ -64,8 +74,20 @@ void Wp81Wol::MainPage::Button_Click(Platform::Object^ sender, Windows::UI::Xaml
 
 	greetingOutput->Text = "Hello, " + nameInput->Text + "!";
 
+	((Platform::Collections::Vector<String^>^)listView1->ItemsSource)->Append(nameInput->Text);
+
 	unsigned port{ 60000 };
 	unsigned long bcast{ 0xFFFFFFFF };
 	Wol::send_wol("D0:50:99:4B:CB:0D", port, bcast);
 
+}
+
+
+void Wp81Wol::MainPage::ItemView_ItemClick(Platform::Object^ sender, Windows::UI::Xaml::Controls::ItemClickEventArgs^ e)
+{
+	String^ item = (String^)e->ClickedItem;
+
+	std::string utf8 = std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(item->Data());
+
+	Debug("Item clicked ! %s\n", utf8.c_str());
 }

@@ -20,6 +20,8 @@ namespace Wp81Wol
 	protected:
 		virtual void OnNavigatedTo(Windows::UI::Xaml::Navigation::NavigationEventArgs^ e) override;
 		void Button_Click(Platform::Object ^ sender, Windows::UI::Xaml::RoutedEventArgs ^ e);
+	private:
+		void ItemView_ItemClick(Platform::Object^ sender, Windows::UI::Xaml::Controls::ItemClickEventArgs^ e);
 	};
 	void Debug(const char * format, ...);
 }

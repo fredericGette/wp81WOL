@@ -9,13 +9,14 @@
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <StackPanel  Margin="20,30,0,0">
-            <TextBlock HorizontalAlignment="Left" Text="Hello World" FontSize="36"/>
+            <TextBlock HorizontalAlignment="Left" Text="Wp81 Wake On Line" FontSize="36"/>
             <TextBlock Text="What's your name?"/>
             <StackPanel Orientation="Vertical" Margin="0,20,0,20">
                 <TextBox x:Name="nameInput" Width="300" HorizontalAlignment="Left"/>
-                <Button x:ConnectionId='1' Content="Say &quot;Hello&quot;"                     />
+                <Button x:ConnectionId='2' Content="Say &quot;Hello&quot;"                     />
             </StackPanel>
             <TextBlock x:Name="greetingOutput"/>
+            <ListView x:ConnectionId='1' x:Name="listView1"                                IsItemClickEnabled="True" SelectionMode="None"/>
         </StackPanel>
     </Grid>
 </Page>

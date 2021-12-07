@@ -24,6 +24,8 @@ void ::Wp81Wol::MainPage::InitializeComponent()
 
     // Get the TextBlock named 'greetingOutput'
     greetingOutput = safe_cast<::Windows::UI::Xaml::Controls::TextBlock^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"greetingOutput"));
+    // Get the ListView named 'listView1'
+    listView1 = safe_cast<::Windows::UI::Xaml::Controls::ListView^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"listView1"));
     // Get the TextBox named 'nameInput'
     nameInput = safe_cast<::Windows::UI::Xaml::Controls::TextBox^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"nameInput"));
 }
@@ -33,6 +35,10 @@ void ::Wp81Wol::MainPage::Connect(int connectionId, Platform::Object^ target)
     switch (connectionId)
     {
     case 1:
+        (safe_cast<::Windows::UI::Xaml::Controls::ListViewBase^>(target))->ItemClick +=
+            ref new ::Windows::UI::Xaml::Controls::ItemClickEventHandler(this, (void (::Wp81Wol::MainPage::*)(Platform::Object^, Windows::UI::Xaml::Controls::ItemClickEventArgs^))&MainPage::ItemView_ItemClick);
+        break;
+    case 2:
         (safe_cast<::Windows::UI::Xaml::Controls::Primitives::ButtonBase^>(target))->Click +=
             ref new ::Windows::UI::Xaml::RoutedEventHandler(this, (void (::Wp81Wol::MainPage::*)(Platform::Object^, Windows::UI::Xaml::RoutedEventArgs^))&MainPage::Button_Click);
         break;
