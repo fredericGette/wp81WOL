@@ -12,9 +12,11 @@ namespace Windows {
     namespace UI {
         namespace Xaml {
             namespace Controls {
+                ref class StackPanel;
+                ref class TextBox;
                 ref class TextBlock;
                 ref class ListView;
-                ref class TextBox;
+                ref class AppBarButton;
             }
         }
     }
@@ -32,9 +34,17 @@ namespace Wp81Wol
     private:
         bool _contentLoaded;
     
-        private: ::Windows::UI::Xaml::Controls::TextBlock^ greetingOutput;
-        private: ::Windows::UI::Xaml::Controls::ListView^ listView1;
-        private: ::Windows::UI::Xaml::Controls::TextBox^ nameInput;
+        private: ::Windows::UI::Xaml::Controls::StackPanel^ PanelListComputerItem;
+        private: ::Windows::UI::Xaml::Controls::StackPanel^ PanelEditComputerItem;
+        private: ::Windows::UI::Xaml::Controls::StackPanel^ PanelHelp;
+        private: ::Windows::UI::Xaml::Controls::TextBox^ TextBoxName;
+        private: ::Windows::UI::Xaml::Controls::TextBox^ TextBoxMacAddress;
+        private: ::Windows::UI::Xaml::Controls::TextBlock^ ListViewIsEmpty;
+        private: ::Windows::UI::Xaml::Controls::ListView^ ListViewComputerItem;
+        private: ::Windows::UI::Xaml::Controls::AppBarButton^ AddAppBarButton;
+        private: ::Windows::UI::Xaml::Controls::AppBarButton^ SaveAppBarButton;
+        private: ::Windows::UI::Xaml::Controls::AppBarButton^ DeleteAppBarButton;
+        private: ::Windows::UI::Xaml::Controls::AppBarButton^ HelpAppBarButton;
     };
 }
 

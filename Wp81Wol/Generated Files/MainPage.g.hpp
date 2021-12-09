@@ -22,12 +22,28 @@ void ::Wp81Wol::MainPage::InitializeComponent()
     // Call LoadComponent on ms-appx:///MainPage.xaml
     ::Windows::UI::Xaml::Application::LoadComponent(this, ref new ::Windows::Foundation::Uri(L"ms-appx:///MainPage.xaml"), ::Windows::UI::Xaml::Controls::Primitives::ComponentResourceLocation::Application);
 
-    // Get the TextBlock named 'greetingOutput'
-    greetingOutput = safe_cast<::Windows::UI::Xaml::Controls::TextBlock^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"greetingOutput"));
-    // Get the ListView named 'listView1'
-    listView1 = safe_cast<::Windows::UI::Xaml::Controls::ListView^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"listView1"));
-    // Get the TextBox named 'nameInput'
-    nameInput = safe_cast<::Windows::UI::Xaml::Controls::TextBox^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"nameInput"));
+    // Get the StackPanel named 'PanelListComputerItem'
+    PanelListComputerItem = safe_cast<::Windows::UI::Xaml::Controls::StackPanel^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"PanelListComputerItem"));
+    // Get the StackPanel named 'PanelEditComputerItem'
+    PanelEditComputerItem = safe_cast<::Windows::UI::Xaml::Controls::StackPanel^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"PanelEditComputerItem"));
+    // Get the StackPanel named 'PanelHelp'
+    PanelHelp = safe_cast<::Windows::UI::Xaml::Controls::StackPanel^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"PanelHelp"));
+    // Get the TextBox named 'TextBoxName'
+    TextBoxName = safe_cast<::Windows::UI::Xaml::Controls::TextBox^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"TextBoxName"));
+    // Get the TextBox named 'TextBoxMacAddress'
+    TextBoxMacAddress = safe_cast<::Windows::UI::Xaml::Controls::TextBox^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"TextBoxMacAddress"));
+    // Get the TextBlock named 'ListViewIsEmpty'
+    ListViewIsEmpty = safe_cast<::Windows::UI::Xaml::Controls::TextBlock^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"ListViewIsEmpty"));
+    // Get the ListView named 'ListViewComputerItem'
+    ListViewComputerItem = safe_cast<::Windows::UI::Xaml::Controls::ListView^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"ListViewComputerItem"));
+    // Get the AppBarButton named 'AddAppBarButton'
+    AddAppBarButton = safe_cast<::Windows::UI::Xaml::Controls::AppBarButton^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"AddAppBarButton"));
+    // Get the AppBarButton named 'SaveAppBarButton'
+    SaveAppBarButton = safe_cast<::Windows::UI::Xaml::Controls::AppBarButton^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"SaveAppBarButton"));
+    // Get the AppBarButton named 'DeleteAppBarButton'
+    DeleteAppBarButton = safe_cast<::Windows::UI::Xaml::Controls::AppBarButton^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"DeleteAppBarButton"));
+    // Get the AppBarButton named 'HelpAppBarButton'
+    HelpAppBarButton = safe_cast<::Windows::UI::Xaml::Controls::AppBarButton^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"HelpAppBarButton"));
 }
 
 void ::Wp81Wol::MainPage::Connect(int connectionId, Platform::Object^ target)
@@ -39,8 +55,24 @@ void ::Wp81Wol::MainPage::Connect(int connectionId, Platform::Object^ target)
             ref new ::Windows::UI::Xaml::Controls::ItemClickEventHandler(this, (void (::Wp81Wol::MainPage::*)(Platform::Object^, Windows::UI::Xaml::Controls::ItemClickEventArgs^))&MainPage::ItemView_ItemClick);
         break;
     case 2:
+        (safe_cast<::Windows::UI::Xaml::UIElement^>(target))->Holding +=
+            ref new ::Windows::UI::Xaml::Input::HoldingEventHandler(this, (void (::Wp81Wol::MainPage::*)(Platform::Object^, Windows::UI::Xaml::Input::HoldingRoutedEventArgs^))&MainPage::ItemView_Holding);
+        break;
+    case 3:
         (safe_cast<::Windows::UI::Xaml::Controls::Primitives::ButtonBase^>(target))->Click +=
-            ref new ::Windows::UI::Xaml::RoutedEventHandler(this, (void (::Wp81Wol::MainPage::*)(Platform::Object^, Windows::UI::Xaml::RoutedEventArgs^))&MainPage::Button_Click);
+            ref new ::Windows::UI::Xaml::RoutedEventHandler(this, (void (::Wp81Wol::MainPage::*)(Platform::Object^, Windows::UI::Xaml::RoutedEventArgs^))&MainPage::AppBarButton_Click);
+        break;
+    case 4:
+        (safe_cast<::Windows::UI::Xaml::Controls::Primitives::ButtonBase^>(target))->Click +=
+            ref new ::Windows::UI::Xaml::RoutedEventHandler(this, (void (::Wp81Wol::MainPage::*)(Platform::Object^, Windows::UI::Xaml::RoutedEventArgs^))&MainPage::AppBarButton_Click);
+        break;
+    case 5:
+        (safe_cast<::Windows::UI::Xaml::Controls::Primitives::ButtonBase^>(target))->Click +=
+            ref new ::Windows::UI::Xaml::RoutedEventHandler(this, (void (::Wp81Wol::MainPage::*)(Platform::Object^, Windows::UI::Xaml::RoutedEventArgs^))&MainPage::AppBarButton_Click);
+        break;
+    case 6:
+        (safe_cast<::Windows::UI::Xaml::Controls::Primitives::ButtonBase^>(target))->Click +=
+            ref new ::Windows::UI::Xaml::RoutedEventHandler(this, (void (::Wp81Wol::MainPage::*)(Platform::Object^, Windows::UI::Xaml::RoutedEventArgs^))&MainPage::AppBarButton_Click);
         break;
     }
     (void)connectionId; // Unused parameter

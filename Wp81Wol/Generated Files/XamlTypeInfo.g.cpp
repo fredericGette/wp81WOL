@@ -72,6 +72,16 @@
         return ref new XamlSystemBaseType(typeName);
     }
 
+    if (typeName == L"Object")
+    {
+        return ref new XamlSystemBaseType(typeName);
+    }
+
+    if (typeName == L"String")
+    {
+        return ref new XamlSystemBaseType(typeName);
+    }
+
     if (typeName == L"Wp81Wol.MainPage")
     {
         ::XamlTypeInfo::InfoProvider::XamlUserType^ userType = ref new ::XamlTypeInfo::InfoProvider::XamlUserType(this, typeName, GetXamlTypeByName(L"Windows.UI.Xaml.Controls.Page"));
@@ -85,13 +95,60 @@
         return userType;
     }
 
+    if (typeName == L"Wp81Wol.ComputerItem")
+    {
+        ::XamlTypeInfo::InfoProvider::XamlUserType^ userType = ref new ::XamlTypeInfo::InfoProvider::XamlUserType(this, typeName, GetXamlTypeByName(L"Object"));
+        userType->KindOfType = ::Windows::UI::Xaml::Interop::TypeKind::Custom;
+        userType->AddMemberName(L"MacAddress");
+        userType->AddMemberName(L"Name");
+        userType->SetIsBindable();
+        userType->SetIsLocalType();
+        return userType;
+    }
+
     return nullptr;
 }
 
 ::Windows::UI::Xaml::Markup::IXamlMember^ ::XamlTypeInfo::InfoProvider::XamlTypeInfoProvider::CreateXamlMember(::Platform::String^ longMemberName)
 {
-    // No Local Properties
-    (void)longMemberName; // Unused parameter
+    if (longMemberName == L"Wp81Wol.ComputerItem.MacAddress")
+    {
+        ::XamlTypeInfo::InfoProvider::XamlMember^ xamlMember = ref new ::XamlTypeInfo::InfoProvider::XamlMember(this, L"MacAddress", L"String");
+        xamlMember->Getter =
+            [](Object^ instance) -> Object^
+            {
+                auto that = (::Wp81Wol::ComputerItem^)instance;
+                return that->MacAddress;
+            };
+
+        xamlMember->Setter =
+            [](Object^ instance, Object^ value) -> void
+            {
+                auto that = (::Wp81Wol::ComputerItem^)instance;
+                that->MacAddress = (::Platform::String^)value;
+            };
+        return xamlMember;
+    }
+
+    if (longMemberName == L"Wp81Wol.ComputerItem.Name")
+    {
+        ::XamlTypeInfo::InfoProvider::XamlMember^ xamlMember = ref new ::XamlTypeInfo::InfoProvider::XamlMember(this, L"Name", L"String");
+        xamlMember->Getter =
+            [](Object^ instance) -> Object^
+            {
+                auto that = (::Wp81Wol::ComputerItem^)instance;
+                return that->Name;
+            };
+
+        xamlMember->Setter =
+            [](Object^ instance, Object^ value) -> void
+            {
+                auto that = (::Wp81Wol::ComputerItem^)instance;
+                that->Name = (::Platform::String^)value;
+            };
+        return xamlMember;
+    }
+
     return nullptr;
 }
 
