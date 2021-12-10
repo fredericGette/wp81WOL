@@ -36,7 +36,6 @@ unsigned get_hex_from_string(const std::string& s)
 			hex |= s[i] - 'A' + 10;
 		}
 		else {
-			Debug("Failed to parse hexadecimal %s", s);
 			throw std::runtime_error("Failed to parse hexadecimal " + s);
 		}
 	}
@@ -61,8 +60,7 @@ std::string get_ether(const std::string& hardware_addr)
 	}
 
 	if (ether_addr.length() != 6) {
-		Debug("%s not a valid ether address", hardware_addr);
-		throw std::runtime_error(hardware_addr + " not a valid ether address");
+		throw std::runtime_error(hardware_addr + " not a valid address");
 	}
 
 
@@ -86,17 +84,16 @@ void Wol::send_wol(const std::string& hardware_addr, unsigned port, unsigned lon
 	// Initialize Winsock
 	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (iResult != NO_ERROR) {
-		Debug("WSAStartup failed with error : %d\n", iResult);
-		return;
+		throw std::runtime_error("WSAStartup failed with error : "+ std::to_string(iResult));
 	}
 
 	//---------------------------------------------
 	// Create a socket for sending data
 	SendSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (SendSocket == INVALID_SOCKET) {
-		Debug("socket failed with error: %ld\n", WSAGetLastError());
+		int error = WSAGetLastError();
 		WSACleanup();
-		return;
+		throw std::runtime_error("Socket failed with error: "+std::to_string(error));
 	}
 
 	// Build the message to send.
@@ -110,10 +107,10 @@ void Wol::send_wol(const std::string& hardware_addr, unsigned port, unsigned lon
 	BOOL bOptVal = TRUE;
 	int bOptLen = sizeof(BOOL);
 	if (setsockopt(SendSocket, SOL_SOCKET, SO_BROADCAST, (char *)&bOptVal, bOptLen) < 0) {
-		Debug("Failed to set socket options: %d\n", WSAGetLastError());
+		int error = WSAGetLastError();
 		closesocket(SendSocket);
 		WSACleanup();
-		return;
+		throw std::runtime_error("Failed to set socket options: " + std::to_string(error));
 	}
 
 
@@ -130,10 +127,10 @@ void Wol::send_wol(const std::string& hardware_addr, unsigned port, unsigned lon
 	iResult = sendto(SendSocket,
 		message.c_str(), message.length(), 0, reinterpret_cast<sockaddr*>(&addr), sizeof(addr));
 	if (iResult == SOCKET_ERROR) {
-		Debug("sendto failed with error: %d\n", WSAGetLastError());
+		int error = WSAGetLastError();
 		closesocket(SendSocket);
 		WSACleanup();
-		return;
+		throw std::runtime_error("sendto failed with error: " + std::to_string(error));
 	}
 
 	//---------------------------------------------
@@ -141,9 +138,9 @@ void Wol::send_wol(const std::string& hardware_addr, unsigned port, unsigned lon
 	Debug("Finished sending. Closing socket.\n");
 	iResult = closesocket(SendSocket);
 	if (iResult == SOCKET_ERROR) {
-		Debug("closesocket failed with error: %d\n", WSAGetLastError());
+		int error = WSAGetLastError();
 		WSACleanup();
-		return;
+		throw std::runtime_error("closesocket failed with error: " + std::to_string(error));
 	}
 
 	//---------------------------------------------

@@ -76,23 +76,17 @@ void MainPage::OnNavigatedTo(NavigationEventArgs^ e)
 	// If you are using the NavigationHelper provided by some templates,
 	// this event is handled for you.
 
-	//listView1->Items->Append("Test A");
 
-	//Platform::Collections::Vector<Wp81Wol::ComputerItem^>^ listComputerItems;
 	listComputerItems = ref new Platform::Collections::Vector<Wp81Wol::ComputerItem^>();
-	//Wp81Wol::ComputerItem^ orditele = ref new Wp81Wol::ComputerItem(L"ORDI TELE", L"D0:50:99:4B:CB:0D");
-	//Wp81Wol::ComputerItem^ ordifred = ref new Wp81Wol::ComputerItem(L"ORDI-FRED", L"AB:CB:19:1B:1B:1D");
 
-	//listComputerItems->Append(orditele);
-	//listComputerItems->Append(ordifred);
 	ListViewComputerItem->ItemsSource = listComputerItems;
 
-	create_task(localFolder->CreateFileAsync(filename, CreationCollisionOption::ReplaceExisting)).then(
+	/*create_task(localFolder->CreateFileAsync(filename, CreationCollisionOption::ReplaceExisting)).then(
 		[this](StorageFile^ file)
 	{
-		return FileIO::WriteTextAsync(file, "Test1\nTest2");
-	});
-
+		return FileIO::WriteTextAsync(file, "v1\nORDI TELE\nD0:50:99:4B:CB:0D\nORDI-FRED\nAB:CB:19:1B:1B:1D");
+	});*/
+	ReadComputerItemListFile();
 }
 
 void Wp81Wol::Debug(const char* format, ...)
@@ -119,7 +113,14 @@ void Wp81Wol::MainPage::ItemView_ItemClick(Platform::Object^ sender, Windows::UI
 
 	unsigned port{ 60000 };
 	unsigned long bcast{ 0xFFFFFFFF };
-	Wol::send_wol(utf8.c_str(), port, bcast);
+	try
+	{
+		Wol::send_wol(utf8.c_str(), port, bcast);
+	}
+	catch (const std::runtime_error& error)
+	{
+		Debug("Wol error: %s", error.what());
+	}
 }
 
 void Wp81Wol::MainPage::AppBarButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
@@ -147,12 +148,13 @@ void Wp81Wol::MainPage::AppBarButton_Click(Platform::Object^ sender, Windows::UI
 			ComputerItem^ item = ref new ComputerItem(TextBoxName->Text, TextBoxMacAddress->Text);
 			listComputerItems->Append(item);
 		}
-		
+		WriteComputerItemListFile();
 		StateComputerItemList();
 	}
 	else if (b->Tag->ToString() == "Delete")
 	{
 		listComputerItems->RemoveAt(editedComputerItemIndex);
+		WriteComputerItemListFile();
 		StateComputerItemList();
 	}	
 	else if (b->Tag->ToString() == "Help")
@@ -256,25 +258,55 @@ bool Wp81Wol::MainPage::IsStateListComputerItem()
 
 void Wp81Wol::MainPage::ReadComputerItemListFile()
 {
+	listComputerItems->Clear();
+
 	create_task(localFolder->GetFileAsync(filename)).then([this](StorageFile^ file)
 	{
 		return FileIO::ReadLinesAsync(file);
 	}).then([this](IVector<String^>^ lines)
 	{
+		String^ version = lines->GetAt(0);
+		std::string utf8 = std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(version->Data());
+		Debug("File version %s\n", utf8.c_str());
+
+		for (unsigned int i = 1; i < lines->Size; i += 2)
+		{
+			ComputerItem^ item = ref new ComputerItem(lines->GetAt(i), lines->GetAt(i + 1));
+			listComputerItems->Append(item);
+		}
+	}).then([this](task<void> t)
+	{
+
 		try
 		{
-			unsigned int size = lines->Size;
-			Debug("Size %d", size);
-
+			t.get();
+			// .get() didn' t throw, so we succeeded.
+			Debug("Read file succeeded.\n");
 		}
-		catch (...)
+		catch (Platform::COMException^ e)
 		{
-			Debug("Error reading %s", filename);
+			//The system cannot find the specified file.
+			OutputDebugString(e->Message->Data());
+			// Create empty file
+			WriteComputerItemListFile();
 		}
+
 	});
 }
 
 void Wp81Wol::MainPage::WriteComputerItemListFile()
 {
-
+	create_task(localFolder->CreateFileAsync(filename, CreationCollisionOption::ReplaceExisting)).then(
+		[this](StorageFile^ file)
+	{
+		IVector<String^>^ lines = ref new Platform::Collections::Vector<String^>();
+		lines->Append("v1");
+		for (unsigned int i = 0; i < listComputerItems->Size; i++)
+		{
+			ComputerItem^ item = listComputerItems->GetAt(i);
+			lines->Append(item->getName());
+			lines->Append(item->getMacAddress());
+		}
+		FileIO::AppendLinesAsync(file, lines);
+	});
 }
