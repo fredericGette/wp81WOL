@@ -36,6 +36,10 @@ void ::Wp81Wol::MainPage::InitializeComponent()
     ListViewIsEmpty = safe_cast<::Windows::UI::Xaml::Controls::TextBlock^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"ListViewIsEmpty"));
     // Get the ListView named 'ListViewComputerItem'
     ListViewComputerItem = safe_cast<::Windows::UI::Xaml::Controls::ListView^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"ListViewComputerItem"));
+    // Get the Flyout named 'FlyoutNotification'
+    FlyoutNotification = safe_cast<::Windows::UI::Xaml::Controls::Flyout^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"FlyoutNotification"));
+    // Get the TextBlock named 'FlyoutNotificationText'
+    FlyoutNotificationText = safe_cast<::Windows::UI::Xaml::Controls::TextBlock^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"FlyoutNotificationText"));
     // Get the AppBarButton named 'AddAppBarButton'
     AddAppBarButton = safe_cast<::Windows::UI::Xaml::Controls::AppBarButton^>(static_cast<Windows::UI::Xaml::IFrameworkElement^>(this)->FindName(L"AddAppBarButton"));
     // Get the AppBarButton named 'SaveAppBarButton'

@@ -16,6 +16,7 @@ namespace Windows {
                 ref class TextBox;
                 ref class TextBlock;
                 ref class ListView;
+                ref class Flyout;
                 ref class AppBarButton;
             }
         }
@@ -41,6 +42,8 @@ namespace Wp81Wol
         private: ::Windows::UI::Xaml::Controls::TextBox^ TextBoxMacAddress;
         private: ::Windows::UI::Xaml::Controls::TextBlock^ ListViewIsEmpty;
         private: ::Windows::UI::Xaml::Controls::ListView^ ListViewComputerItem;
+        private: ::Windows::UI::Xaml::Controls::Flyout^ FlyoutNotification;
+        private: ::Windows::UI::Xaml::Controls::TextBlock^ FlyoutNotificationText;
         private: ::Windows::UI::Xaml::Controls::AppBarButton^ AddAppBarButton;
         private: ::Windows::UI::Xaml::Controls::AppBarButton^ SaveAppBarButton;
         private: ::Windows::UI::Xaml::Controls::AppBarButton^ DeleteAppBarButton;

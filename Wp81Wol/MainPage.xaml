@@ -7,6 +7,15 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
+    <Page.Resources>
+        <Style x:Key="InfoNotificationStyle" TargetType="FlyoutPresenter">
+            <Setter Property="Background" Value="Green"/>
+        </Style>
+        <Style x:Key="ErrorNotificationStyle" TargetType="FlyoutPresenter">
+            <Setter Property="Background" Value="Red"/>
+        </Style>
+    </Page.Resources>
+
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <StackPanel x:Name="PanelListComputerItem"  Margin="20,30,0,0">
             <TextBlock HorizontalAlignment="Left" Text="Wp81 Wake On LAN" FontSize="36"/>
@@ -16,12 +25,17 @@
                     <DataTemplate x:Name="DoubleLineDataTemplate">
                         <Border BorderBrush="Gray" BorderThickness="4" Margin="0,10,0,10" MinWidth="360">
                             <StackPanel Orientation="Vertical" Margin="0,10,0,10" Holding="ItemView_Holding">
-                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Style="{ThemeResource BaseTextBlockStyle}" Margin="12,0,0,0" />
-                                <TextBlock Text="{Binding MacAddress}" VerticalAlignment="Center" Style="{ThemeResource BaseTextBlockStyle}" Margin="12,0,0,0" />
+                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontSize="30" Margin="12,0,0,0" />
+                                <TextBlock Text="{Binding MacAddress}" VerticalAlignment="Center" FontSize="20" Margin="12,0,0,0" />
                             </StackPanel>
                         </Border>
                     </DataTemplate>
                 </ListView.ItemTemplate>
+                <FlyoutBase.AttachedFlyout>
+                    <Flyout x:Name="FlyoutNotification" FlyoutPresenterStyle="{StaticResource InfoNotificationStyle}">
+                        <TextBlock x:Name="FlyoutNotificationText" Text="" HorizontalAlignment="Center" FontSize="18" />
+                    </Flyout>
+                </FlyoutBase.AttachedFlyout>
             </ListView>
         </StackPanel>
         <StackPanel x:Name="PanelEditComputerItem" Margin="20,30,0,0" Visibility="Collapsed">

@@ -27,12 +27,21 @@ using namespace Windows::Storage;
 using namespace concurrency;
 
 #define filename "wp81WolFile.txt"
+#define fileVersion "v1"
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
+// List of computers
 Platform::Collections::Vector<Wp81Wol::ComputerItem^>^ listComputerItems = nullptr;
+
+// Index (of the list) of the edited computer
 int editedComputerItemIndex = -1;
+
+// Local storage folder.
 Windows::Storage::StorageFolder^ localFolder = nullptr;
+
+// Timer to auto-hide the "notification Flyout".
+Windows::UI::Xaml::DispatcherTimer^ timer = nullptr;
 
 MainPage::MainPage()
 {
@@ -45,8 +54,7 @@ MainPage::MainPage()
 
 void MainPage::HardwareButtons_BackPressed(Object^ sender, Windows::Phone::UI::Input::BackPressedEventArgs^ e)
 {
-	Debug("Back pressed\n");
-
+	// Return to the list of computer.
 	if (!IsStateListComputerItem())
 	{
 		//Indicate the back button press is handled so the app does not exit
@@ -56,7 +64,6 @@ void MainPage::HardwareButtons_BackPressed(Object^ sender, Windows::Phone::UI::I
 	}
 
 	ReadComputerItemListFile();
-
 }
 
 /// <summary>
@@ -78,14 +85,9 @@ void MainPage::OnNavigatedTo(NavigationEventArgs^ e)
 
 
 	listComputerItems = ref new Platform::Collections::Vector<Wp81Wol::ComputerItem^>();
-
 	ListViewComputerItem->ItemsSource = listComputerItems;
 
-	/*create_task(localFolder->CreateFileAsync(filename, CreationCollisionOption::ReplaceExisting)).then(
-		[this](StorageFile^ file)
-	{
-		return FileIO::WriteTextAsync(file, "v1\nORDI TELE\nD0:50:99:4B:CB:0D\nORDI-FRED\nAB:CB:19:1B:1B:1D");
-	});*/
+	// Init the list of computers from a previously created file.
 	ReadComputerItemListFile();
 }
 
@@ -108,19 +110,40 @@ void Wp81Wol::MainPage::ItemView_ItemClick(Platform::Object^ sender, Windows::UI
 	ComputerItem^ item = (ComputerItem^)e->ClickedItem;
 
 	std::string utf8 = std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(item->getMacAddress()->Data());
-
 	Debug("Item clicked ! %s\n", utf8.c_str());
 
 	unsigned port{ 60000 };
 	unsigned long bcast{ 0xFFFFFFFF };
+	String^ notificationText = L"WOL packet sent.";
+	Windows::UI::Xaml::Style^ style = safe_cast<Windows::UI::Xaml::Style ^>(Resources->Lookup("InfoNotificationStyle"));
 	try
 	{
 		Wol::send_wol(utf8.c_str(), port, bcast);
 	}
 	catch (const std::runtime_error& error)
 	{
-		Debug("Wol error: %s", error.what());
+		Debug("Wol error: %s\n", error.what());
+		std::string s_str = std::string(error.what());
+		std::wstring wid_str = std::wstring(s_str.begin(), s_str.end());
+		const wchar_t* w_char = wid_str.c_str();
+		notificationText = ref new String(w_char);
+		style = safe_cast<Windows::UI::Xaml::Style ^>(Resources->Lookup("ErrorNotificationStyle"));
 	}
+	FlyoutNotificationText->Text = notificationText;
+	FlyoutNotification->FlyoutPresenterStyle = safe_cast<Windows::UI::Xaml::Style ^>(style);
+	FlyoutNotification->ShowAt((ListView^)sender);
+
+	timer = ref new Windows::UI::Xaml::DispatcherTimer();
+	TimeSpan ts;
+	ts.Duration = 20000000; // 100-ns
+	timer->Interval = ts;
+	timer->Start();
+	auto registrationtoken = timer->Tick += ref new EventHandler<Object^>(this, &MainPage::OnTick);
+}
+
+void MainPage::OnTick(Object^ sender, Object^ e) {
+	timer->Stop();
+	FlyoutNotification->Hide();
 }
 
 void Wp81Wol::MainPage::AppBarButton_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
@@ -128,6 +151,7 @@ void Wp81Wol::MainPage::AppBarButton_Click(Platform::Object^ sender, Windows::UI
 	Button^ b = (Button^)sender;
 	if (b->Tag->ToString() == "Add")
 	{
+		// Want to add a new computer
 		TextBoxName->Text = "";
 		TextBoxMacAddress->Text = "";
 		StateCreateComputerItem();
@@ -136,6 +160,7 @@ void Wp81Wol::MainPage::AppBarButton_Click(Platform::Object^ sender, Windows::UI
 	{
 		if (IsStateEditComputerItem())
 		{ 
+			// Save existing computer.
 			ComputerItem^ item = listComputerItems->GetAt(editedComputerItemIndex);
 			item->setName(TextBoxName->Text);
 			item->setMacAddress(TextBoxMacAddress->Text);
@@ -144,7 +169,7 @@ void Wp81Wol::MainPage::AppBarButton_Click(Platform::Object^ sender, Windows::UI
 		}
 		else
 		{
-			// Create a new ComputerItem
+			// Save/create a new ComputerItem
 			ComputerItem^ item = ref new ComputerItem(TextBoxName->Text, TextBoxMacAddress->Text);
 			listComputerItems->Append(item);
 		}
@@ -153,18 +178,21 @@ void Wp81Wol::MainPage::AppBarButton_Click(Platform::Object^ sender, Windows::UI
 	}
 	else if (b->Tag->ToString() == "Delete")
 	{
+		// Delete a computer
 		listComputerItems->RemoveAt(editedComputerItemIndex);
 		WriteComputerItemListFile();
 		StateComputerItemList();
 	}	
 	else if (b->Tag->ToString() == "Help")
 	{
+		// Want to see the help page.
 		StateHelp();
 	}
 }
 
 void Wp81Wol::MainPage::ItemView_Holding(Platform::Object^ sender, Windows::UI::Xaml::Input::HoldingRoutedEventArgs^ e)
 {
+	// Hold and release a computer item.
 	if (e->HoldingState == Windows::UI::Input::HoldingState::Completed)
 	{
 		StackPanel^sp = (StackPanel^)sender;
@@ -184,10 +212,9 @@ void Wp81Wol::MainPage::ItemView_Holding(Platform::Object^ sender, Windows::UI::
 			// Item not found ?
 			Debug("Item not found");
 		}
-		
 	}
-	
 }
+
 
 ////////////////////////////////////
 
@@ -254,7 +281,7 @@ bool Wp81Wol::MainPage::IsStateListComputerItem()
 	return PanelListComputerItem->Visibility == Windows::UI::Xaml::Visibility::Visible;
 }
 
-/////////
+////////////////////////////////////
 
 void Wp81Wol::MainPage::ReadComputerItemListFile()
 {
@@ -287,6 +314,7 @@ void Wp81Wol::MainPage::ReadComputerItemListFile()
 		{
 			//The system cannot find the specified file.
 			OutputDebugString(e->Message->Data());
+			// First time that this application is launched?
 			// Create empty file
 			WriteComputerItemListFile();
 		}
@@ -300,13 +328,15 @@ void Wp81Wol::MainPage::WriteComputerItemListFile()
 		[this](StorageFile^ file)
 	{
 		IVector<String^>^ lines = ref new Platform::Collections::Vector<String^>();
-		lines->Append("v1");
+		lines->Append(fileVersion);
 		for (unsigned int i = 0; i < listComputerItems->Size; i++)
 		{
 			ComputerItem^ item = listComputerItems->GetAt(i);
 			lines->Append(item->getName());
 			lines->Append(item->getMacAddress());
 		}
-		FileIO::AppendLinesAsync(file, lines);
+		return FileIO::AppendLinesAsync(file, lines);
 	});
 }
+
+
