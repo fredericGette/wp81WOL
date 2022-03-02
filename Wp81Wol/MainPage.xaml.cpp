@@ -25,6 +25,7 @@ using namespace Windows::UI::Xaml::Navigation;
 using namespace Windows::Phone::UI::Input;
 using namespace Windows::Storage;
 using namespace concurrency;
+using namespace Windows::Networking::Connectivity;
 
 #define filename "wp81WolFile.txt"
 #define fileVersion "v1"
@@ -104,13 +105,57 @@ void Wp81Wol::Debug(const char* format, ...)
 	va_end(args);
 }
 
+/**
+* see https://social.msdn.microsoft.com/Forums/sqlserver/en-US/2fda9c75-135c-4ead-9a6c-28d78a83b6e0/force-winsock2-socket-to-use-wifi-connection?forum=wpdevelop
+*/
+String^ getWiFiIP()
+{
+	std::vector<String^> ipAddresses;
+	auto hostnames = NetworkInformation::GetHostNames();
+
+	for (unsigned int i = 0; i < hostnames->Size; ++i)
+	{
+		auto hn = hostnames->GetAt(i);
+
+		//IanaInterfaceType == 71 => Wifi
+		//IanaInterfaceType == 6 => Ethernet (Emulator)
+		if (hn->IPInformation != nullptr)
+		{
+			auto type = hn->IPInformation->NetworkAdapter->IanaInterfaceType;
+			if (type == 71 || type == 6)
+			{
+				auto ipAddress = hn->DisplayName;
+				ipAddresses.push_back(ipAddress);
+			}
+		}
+	}
+
+	if (ipAddresses.size() < 1)
+	{
+		return nullptr;
+	}
+	else
+	{
+		return ipAddresses[ipAddresses.size() - 1];
+	}
+}
+
+
 
 void Wp81Wol::MainPage::ItemView_ItemClick(Platform::Object^ sender, Windows::UI::Xaml::Controls::ItemClickEventArgs^ e)
 {
 	ComputerItem^ item = (ComputerItem^)e->ClickedItem;
 
-	std::string utf8 = std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(item->getMacAddress()->Data());
-	Debug("Item clicked ! %s\n", utf8.c_str());
+	std::string macAddress = std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(item->getMacAddress()->Data());
+	Debug("Item clicked ! %s\n", macAddress.c_str());
+
+	//Getting WiFi Interface IP
+	Platform::String^ wifiIp = getWiFiIP();
+	Debug("Wifi interface IP:"); OutputDebugString(wifiIp->Data()); Debug("\n");
+	std::string wifiIpstr = "";
+	if (wifiIp != nullptr) {
+		wifiIpstr = std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(wifiIp->Data());
+	}
 
 	unsigned port{ 60000 };
 	unsigned long bcast{ 0xFFFFFFFF };
@@ -118,7 +163,7 @@ void Wp81Wol::MainPage::ItemView_ItemClick(Platform::Object^ sender, Windows::UI
 	Windows::UI::Xaml::Style^ style = safe_cast<Windows::UI::Xaml::Style ^>(Resources->Lookup("InfoNotificationStyle"));
 	try
 	{
-		Wol::send_wol(utf8.c_str(), port, bcast);
+		Wol::send_wol(macAddress.c_str(), port, bcast, wifiIpstr);
 	}
 	catch (const std::runtime_error& error)
 	{

@@ -70,7 +70,7 @@ std::string get_ether(const std::string& hardware_addr)
 
 // Sends Wake-On-LAN packet to given address with the given options, where the
 // address is in the form "XX:XX:XX:XX:XX:XX" (the colons are optional).
-void Wol::send_wol(const std::string& hardware_addr, unsigned port, unsigned long bcast)
+void Wol::send_wol(const std::string& hardware_addr, unsigned port, unsigned long bcast, const std::string& wifiIp)
 {
 	// Fetch the hardware address. 
 	const std::string ether_addr{ get_ether(hardware_addr) };
@@ -95,6 +95,19 @@ void Wol::send_wol(const std::string& hardware_addr, unsigned port, unsigned lon
 		WSACleanup();
 		throw std::runtime_error("Socket failed with error: "+std::to_string(error));
 	}
+
+	// Force winsock2 to use the Wifi even when there's a cellular data connection on the phone
+	// see https://social.msdn.microsoft.com/Forums/sqlserver/en-US/2fda9c75-135c-4ead-9a6c-28d78a83b6e0/force-winsock2-socket-to-use-wifi-connection?forum=wpdevelop
+	sockaddr_in addrFrom{};
+	addrFrom.sin_family = AF_INET;
+	addrFrom.sin_port = htons(port);
+	if (wifiIp != "") {
+		addrFrom.sin_addr.s_addr = inet_addr(wifiIp.c_str());
+	} else {
+		addrFrom.sin_addr.s_addr = htonl(INADDR_ANY);
+	}
+	//Binding socket to WiFi Interface IP
+	bind(SendSocket, (struct sockaddr*)&addrFrom, sizeof(addrFrom));
 
 	// Build the message to send.
 	//   (6 * 0XFF followed by 16 * destination address.) 
