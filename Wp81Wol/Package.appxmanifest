@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:m3="http://schemas.microsoft.com/appx/2014/manifest" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest">
-  <Identity Name="8c5b20bc-ee86-4e02-8784-9bc93c7d5ec0" Publisher="CN=frede" Version="1.0.0.0" />
+  <Identity Name="8c5b20bc-ee86-4e02-8784-9bc93c7d5ec0" Publisher="CN=frede" Version="1.0.1.0" />
   <mp:PhoneIdentity PhoneProductId="8c5b20bc-ee86-4e02-8784-9bc93c7d5ec0" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>Wp81Wol</DisplayName>

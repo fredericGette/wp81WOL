@@ -51,7 +51,7 @@
             <TextBlock Text="Thereby you can remotely start this computer - if this computer allows this feature." Margin="0,10,0,0" Style="{ThemeResource BaseTextBlockStyle}" />
             <TextBlock Text="The computer is identified by the MAC address of its network adapter. Address is in the form XX:XX:XX:XX:XX:XX (the colons are optional)." Margin="0,10,0,0" Style="{ThemeResource BaseTextBlockStyle}"/>
             <TextBlock Text="Long press an item of the list to edit." Margin="0,10,0,0" Style="{ThemeResource BaseTextBlockStyle}"/>
-            <TextBlock Text="v1.0 - 2021 - fredget" Margin="0,40,0,0" Style="{ThemeResource BaseTextBlockStyle}"/>
+            <TextBlock Text="v1.0.1 - 2022 - fredget" Margin="0,40,0,0" Style="{ThemeResource BaseTextBlockStyle}"/>
         </StackPanel>
     </Grid>
 
