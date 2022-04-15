@@ -1,5 +1,5 @@
 # wp81WOL
-Wake-on-LAN application for WindowsPhone 8.1
+Wake-on-LAN application for Windows Phone 8.1
 
 To "wake up" computers on your local network.
 
